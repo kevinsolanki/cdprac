@@ -1,0 +1,972 @@
+
+Practical: 1
+
+	Aim: Implementation of Finite Automata and String Validation.
+
+•	Code:
+#include <stdio.h>
+int main(){
+int length;
+printf("enter length of string ");
+scanf("%d",&length);
+char str[length];
+int i,flag=0;
+printf("Enter the String :");
+scanf("%s",str);
+for(i=0;str[i]!='\0';i++){
+	if(str[i]=='0' || str[i]=='1'){
+		flag=1;
+	}else{
+		flag=0;
+		break;	
+	      }
+     }
+if(flag==1){
+	if(str[length-1]=='1' && str[length-2] == '0'){
+		printf("String is accepted");
+	}else{
+		printf("String is not accepted");
+	}
+}else{
+	printf("String is not accepted");	}   
+}
+
+ 
+•	Output: 
+
+  
+
+
+Practical: 3
+
+	AIM: Implement following Programs Using Lex.
+
+[I]	Generate Count of words
+•	Code:
+%{
+#include <stdio.h>
+int i = 0;
+%}
+%%
+[a-zA-Z0-9]* {i++;} 
+"\n" {printf("Count of words for given message : %d\n", i); i = 0;}
+%%
+void main(){
+	printf("enter message to count word : ");
+	yylex();
+}
+int yywrap(){	return 1;	}
+
+•	Output:
+
+
+ 
+[II]	Ceaser Cipher :
+•	Code:
+%{
+#include <stdio.h>
+%}
+%%
+[a-z] {char ch = yytext[0];
+ch += 3;
+if (ch> 'z') ch -= ('z'+1- 'a');
+printf ("%c" ,ch );
+}
+
+[A-Z] { char ch = yytext[0] ;
+ch += 3;
+if (ch> 'Z') ch -= ('Z'+1- 'A');
+printf("%c",ch);
+}
+%%
+void main(){
+	printf("enter input : ");
+	yylex();
+}
+int yywrap(){	return 1;	}
+
+•	Output:
+
+
+ 
+
+[III]	Extract single and multiline comments from C Program.
+•	Input File:
+#include <stdio.h>
+void main(){	
+//single line comment
+printf("hello world")
+/*multi line code
+statement
+reqiring up*/
+printf("adios");
+}
+
+•	Code(Lex File):
+%{
+#include<stdio.h>
+%}
+%%
+\/\/(.*) {};	
+\/\*(.*\n)*.*\*\/  {};		
+%%
+int yywrap(){	return 1;	}
+void main(){
+yyin=fopen("Prac_3C_ip.c","r");
+yyout=fopen("Prac_3C_op.c","w");
+yylex();
+}
+•	Output :
+
+•	Input File :
+
+
+•	Output File :
+
+
+
+
+ 
+
+Practical: 4
+
+	AIM: Implement following Programs Using Lex.
+
+[I]	Convert Roman number to Decimal Number :
+•	Code:
+%{
+#include <stdio.h>
+int total=0;
+%}
+WS      [ \t]+
+%%
+I       total += 1;
+IV      total += 4;
+V       total += 5;
+IX      total += 9;
+X       total += 10;
+XL      total += 40;
+L       total += 50;
+XC      total += 90;
+C       total += 100;
+CD      total += 400;
+D       total += 500;
+CM      total += 900;
+M       total += 1000;
+{WS}    |
+\n      return total;
+%%
+int main (){
+	int input;
+printf ("Enter roman number: ");	
+	input = yylex();
+printf ("number is : %d\n", input);
+return 0;
+}
+int yywrap(){	return 1;	}
+
+•	Output:
+
+
+[II]	Check weather given statement is compound or simple.
+•	Code:
+%{
+	#include<stdio.h>
+	int flag=0;
+%}
+
+%%
+and |
+or |
+but |
+because |
+if |
+then |
+nevertheless  { flag=1; }
+.  ;
+\n  { return 0; }
+%%
+int main(){
+	printf("Enter the sentence:\n");
+	yylex();
+	if(flag==0)
+		printf("Simple sentence\n");
+	else
+		printf("compound sentence\n");
+}
+int yywrap( ){	return 1; }
+
+•	Output:
+
+
+[III]	Extract html tags from .html file.
+
+•	Html File
+<html>
+<head><title>Hello World </title></head>
+<body><h1>WE are ravaging</h1></body>
+</html>
+
+
+•	Code (Lex File) :
+%{
+#include <stdio.h>
+%}
+%%
+"<"[^>]*> {printf("%s\n", yytext); } 
+. ; 
+%%	
+int yywrap(){}
+int main(int argc, char*argv[]){
+	yyin = fopen("Prac_4C_ip.txt","r");
+	yylex();
+	return 0;
+}
+
+•	Output:
+
+ 
+
+Practical: 5
+
+	AIM: Implementation of Recursive Descent Parser without backtracking.
+Input: The string to be parsed.
+Output: Whether string parsed successfully or not.
+Explanation: Students have to implement the recursive procedure for
+RDP for a typical grammar. The production no. are displayed as they are used to derive the string.
+
+	Code:
+#include<stdio.h>
+char str[20];
+int ptr=0;
+char l;
+int flag = 0;
+void getString(){
+printf("--------------Production Rules--------------\nS -> aS'\nS' -> -cS/^\nUsing Above Grammer Enter a String : ");
+  	scanf("%[^\n]%*c", str);
+ 	printf("%s", l);
+}
+void error(){	flag = 0;  }
+int match(char x){
+	printf("In Match() %c\n",l);
+	if(l == '$'){
+		flag = 1;
+		return 0;
+	}
+	if(l == x){
+		ptr++;
+		l = str[ptr];
+	}else{
+		error();
+		return 0;
+	}
+}
+void Edesh(){
+	if(l == '-'){
+		match('-');
+		match('a');
+		E();
+	}else{
+		error();
+	}
+}
+void E(){
+	printf("In E() %c\n",l);
+	l = str[ptr];
+	match('a');
+	if(l != '$'){
+		Edesh();
+	}
+}
+void main(){
+	getString();
+	E();
+	match('$');
+	if(flag == 1){
+		printf("String is accepted\n");
+	}else{
+		printf("String is not accepted\n");
+	}	}
+
+	Output:
+
+
+
+
+Practical 7: Generate 3-tuple intermediate code for given infix expression
+Code:
+#include <stdio.h>
+#include <string.h>
+void pm();
+void plus();
+void div();
+int i, ch, j, l, addr = 100;
+char ex[10], expr[10], exp1[10], expr2[10], id1[5], op[5], id2[5];
+
+void main()
+{
+    printf("\nEnter the Infix expression: ");
+    scanf("%s", ex);
+    strcpy(expr, ex);
+    l = strlen(expr);
+    exp1[0] = '\0';
+
+    for (i = 0; i < l; i++)
+    {
+        if (expr[i] == '+' || expr[i] == '-')
+        {
+            if (expr[i + 2] == '/' || expr[i + 2] == '*')
+            {
+                pm();
+                break;
+            }
+            else
+            {
+                plus();
+                break;
+            }
+        }
+        else if (expr[i] == '/' || expr[i] == '*')
+        {
+            div();
+            break;
+        }
+    }
+}
+
+void pm()
+{
+    strrev(expr);
+    j = l - i - 1;
+    strncat(exp1, expr, j);
+    strrev(exp1);
+    printf("\nThree address code:\ntemp=%s\ntemp1=%c%ctemp\n", exp1, expr[j + 1], expr[j]);
+}
+void div()
+{
+    strncat(exp1, expr, i + 2);
+    printf("\nThree address code:\ntemp=%s\ntemp1=temp%c%c\n", exp1, expr[i + 2], expr[i + 3]);
+}
+void plus()
+{
+    strncat(exp1, expr, i + 2);
+    printf("\nThree address code:\ntemp=%s\ntemp1=temp%c%c\n", exp1, expr[i + 2], expr[i + 3]);
+}
+
+Output: 
+
+ 
+ 
+Practical 8: Extract Predecessor and Successor from given Control Flow Graph 
+Code (Java):
+	import java.io.*;
+import java.util.*;
+
+public class App {
+    private static class Node {
+        int data;
+        ArrayList<Node> children = new ArrayList<>();
+    }
+
+    public static void display(Node node) {
+        String str = node.data + " -> ";
+        for (Node child : node.children) {
+            str += child.data + ", ";
+        }
+        str += ".";
+        System.out.println(str);
+
+        for (Node child : node.children) {
+            display(child);
+        }
+    }
+
+    public static Node construct(int[] arr) {
+        Node root = null;
+
+        Stack<Node> st = new Stack<>();
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] == -1) {
+                st.pop();
+            } else {
+                Node t = new Node();
+                t.data = arr[i];
+
+                if (st.size() > 0) {
+                    st.peek().children.add(t);
+                } else {
+                    root = t;
+                }
+
+                st.push(t);
+            }
+        }
+
+        return root;
+    }
+
+    static Node predecessor;
+    static Node successor;
+    static int state;
+
+    public static void predecessorAndSuccessor(Node node, int data) {
+        if (state == 0) {
+            if (node.data == data) {
+                state++;
+            } else {
+                predecessor = node;
+            }
+        } else if (state == 1) {
+            successor = node;
+            state++;
+        }
+
+        for (Node child : node.children) {
+            predecessorAndSuccessor(child, data);
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+        System.out.println("Enter No. of nodes : ");
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int n = Integer.parseInt(br.readLine());
+        int[] arr = new int[n];
+        System.out.println("Enter nodes : ");
+        String[] values = br.readLine().split(" ");
+        for (int i = 0; i < n; i++) {
+            arr[i] = Integer.parseInt(values[i]);
+        }
+        System.out.println("Enter node whose prdecessor and successor is to be found : ");
+        int data = Integer.parseInt(br.readLine());
+
+        Node root = construct(arr);
+        predecessor = null;
+        successor = null;
+        state = 0;
+        predecessorAndSuccessor(root, data);
+        if (predecessor == null) {
+            System.out.println("Predecessor = Not found");
+        } else {
+            System.out.println("Predecessor = " + predecessor.data);
+        }
+
+        if (successor == null) {
+            System.out.println("Successor = Not found");
+        } else {
+            System.out.println("Successor = " + successor.data);
+        }
+    }
+
+}
+
+Output:
+
+ 
+
+  
+Practical 11: Implement a C program for constructing LL (1) parsing.
+Code:
+#include <stdio.h>
+#include <string.h>
+char s[20], stack[20];
+
+void main()
+{
+    char m[5][6][3] = {"tb", " ", " ", "tb", " ", " ", " ", "+tb", " ", " ", "n", "n", "fc", " ", " ", "fc", " ", " ", " ", "n", "*fc", " a", "n", "n", "i", " ", " ", "(e)", " ", " "};
+    int size[5][6] = {2, 0, 0, 2, 0, 0, 0, 3, 0, 0, 1, 1, 2, 0, 0, 2, 0, 0, 0, 1, 3, 0, 1, 1, 1, 0, 0, 3, 0, 0};
+    int i, j, k, n, str1, str2;
+    printf("\n Enter the input string: ");
+    scanf("%s", s);
+    strcat(s, "$");
+    n = strlen(s);
+    stack[0] = '$';
+    stack[1] = 'e';
+    i = 1;
+    j = 0;
+    printf("\nStack Input\n");
+    printf("__________________\n");
+    while ((stack[i] != '$') && (s[j] != '$'))
+    {
+        if (stack[i] == s[j])
+        {
+            i--;
+            j++;
+        }
+        switch (stack[i])
+        {
+        case 'e':
+            str1 = 0;
+            break;
+        case 'b':
+            str1 = 1;
+            break;
+        case 't':
+            str1 = 2;
+            break;
+        case 'c':
+            str1 = 3;
+            break;
+        case 'f':
+            str1 = 4;
+            break;
+        }
+        switch (s[j])
+        {
+        case 'i':
+            str2 = 0;
+            break;
+        case '+':
+            str2 = 1;
+            break;
+        case '*':
+            str2 = 2;
+            break;
+        case '(':
+            str2 = 3;
+            break;
+        case ')':
+            str2 = 4;
+            break;
+        case '$':
+            str2 = 5;
+            break;
+        }
+        if (m[str1][str2][0] == '\0')
+        {
+            printf("\nERROR");
+            exit(0);
+        }
+        else if (m[str1][str2][0] == 'n')
+            i--;
+        else if (m[str1][str2][0] == 'i')
+            stack[i] = 'i';
+        else
+        {
+            for (k = size[str1][str2] - 1; k >= 0; k--)
+            {
+                stack[i] = m[str1][str2][k];
+                i++;
+            }
+            i--;
+        }
+        for (k = 0; k <= i; k++)
+            printf(" %c", stack[k]);
+        printf(" ");
+        for (k = j; k <= n; k++)
+            printf("%c", s[k]);
+        printf(" \n ");
+    }
+    printf("\n SUCCESS");
+}
+
+Output:
+
+ 
+
+ 
+Practical 12: Implement a C program to implement LALR parsing.
+Code:
+/*LALR PARSER
+E->E+T
+E->T
+T->T*F
+T->F
+F->(E)
+F->i
+*/
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+void push(char *, int *, char);
+char stacktop(char *);
+void isproduct(char, char);
+int ister(char);
+int isnter(char);
+int isstate(char);
+void error();
+void isreduce(char, char);
+char pop(char *, int *);
+void printt(char *, int *, char[], int);
+void rep(char[], int);
+struct action
+{char row[6][5];};
+const struct action A[12] = {
+    {"sf", "emp", "emp", "se", "emp", "emp"},
+    {"emp", "sg", "emp", "emp", "emp", "acc"},
+    {"emp", "rc", "sh", "emp", "rc", "rc"},
+    {"emp", "re", "re", "emp", "re", "re"},
+    {"sf", "emp", "emp", "se", "emp", "emp"},
+    {"emp", "rg", "rg", "emp", "rg", "rg"},
+    {"sf", "emp", "emp", "se", "emp", "emp"},
+    {"sf", "emp", "emp", "se", "emp", "emp"},
+    {"emp", "sg", "emp", "emp", "sl", "emp"},
+    {"emp", "rb", "sh", "emp", "rb", "rb"},
+    {"emp", "rb", "rd", "emp", "rd", "rd"},
+    {"emp", "rf", "rf", "emp", "rf", "rf"}};
+struct gotol
+{ char r[3][4];};
+const struct gotol G[12] = {
+    {"b", "c", "d"},
+    {"emp", "emp", "emp"},
+    {"emp", "emp", "emp"},
+    {"emp", "emp", "emp"},
+    {"i", "c", "d"},
+    {"emp", "emp", "emp"},
+    {"emp", "j", "d"},
+    {"emp", "emp", "k"},
+    {"emp", "emp", "emp"},
+    {"emp", "emp", "emp"},
+};
+char ter[6] = {'i', '+', '*', ')', '(', '$'};
+char nter[3] = {'E', 'T', 'F'};
+char states[12] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'm', 'j', 'k', 'l'};
+char stack[100];
+int top = -1;
+char temp[10];
+struct grammar
+{
+    char left;
+    char right[5];};
+const struct grammar rl[6] = {
+    {'E', "e+T"},
+    {'E', "T"},
+    {'T', "T*F"},
+    {'T', "F"},
+    {'F', "(E)"},
+    {'F', "i"},
+};
+void main()
+{
+    char inp[80], x, p, dl[80], y, bl = 'a';
+    int i = 0, j, k, l, n, m, c, len;
+    printf(" Enter the input :");
+    scanf("%s", inp);
+    len = strlen(inp);
+    inp[len] = '$';
+    inp[len + 1] = '\0';
+    push(stack, &top, bl);
+    printf("\n stack \t\t\t input");
+    printt(stack, &top, inp, i);
+    do
+    {
+        x = inp[i];
+        p = stacktop(stack);
+        isproduct(x, p);
+        if (strcmp(temp, "emp") == 0)
+            error();
+        if (strcmp(temp, "acc") == 0)
+            break;
+        else
+        {
+            if (temp[0] == 's')
+            {
+                push(stack, &top, inp[i]);
+                push(stack, &top, temp[1]);
+                i++;
+            }
+            else
+            {
+                if (temp[0] == 'r')
+                {
+                    j = isstate(temp[1]);
+                    strcpy(temp, rl[j - 2].right);
+                    dl[0] = rl[j - 2].left;
+                    dl[1] = '\0';
+                    n = strlen(temp);
+                    for (k = 0; k < 2 * n; k++)
+                        pop(stack, &top);
+                    for (m = 0; dl[m] != '\0'; m++)
+                        push(stack, &top, dl[m]);
+                    l = top;
+                    y = stack[l - 1];
+                    isreduce(y, dl[0]);
+                    for (m = 0; temp[m] != '\0'; m++)
+                        push(stack, &top, temp[m]);
+                }
+            }
+        }
+        printt(stack, &top, inp, i);
+    } while (inp[i] != '\0');
+    if (strcmp(temp, "acc") == 0)
+        printf(" \n accept the input ");
+    else
+        printf(" \n do not accept the input ");
+    getch();
+}
+void push(char *s, int *sp, char item)
+{
+    if (*sp == 100)
+        printf(" stack is full ");
+    else
+    {
+        *sp = *sp + 1;
+        s[*sp] = item;
+    }
+}
+char stacktop(char *s)
+{
+    char i;
+    i = s[top];
+    return i;
+}
+void isproduct(char x, char p)
+{
+    int k, l;
+    k = ister(x);
+    l = isstate(p);
+    strcpy(temp, A[l - 1].row[k - 1]);
+}
+int ister(char x)
+{
+    int i;
+    for (i = 0; i < 6; i++)
+        if (x == ter[i])
+            return i + 1;
+    return 0;
+}
+int isnter(char x)
+{
+    int i;
+    for (i = 0; i < 3; i++)
+        if (x == nter[i])
+            return i + 1;
+    return 0;
+}
+int isstate(char p)
+{
+    int i;
+    for (i = 0; i < 12; i++)
+        if (p == states[i])
+            return i + 1;
+    return 0;
+}
+void error()
+{
+    printf(" error in the input ");
+    exit(0);
+}
+void isreduce(char x, char p)
+{
+    int k, l;
+    k = isstate(x);
+    l = isnter(p);
+    strcpy(temp, G[k - 1].r[l - 1]);
+}
+char pop(char *s, int *sp)
+{
+    char item;
+    if (*sp == -1)
+        printf(" stack is empty ");
+    else
+    {
+        item = s[*sp];
+        *sp = *sp - 1;
+    }
+    return item;
+}
+void printt(char *t, int *p, char inp[], int i)
+{
+    int r;
+    printf("\n");
+    for (r = 0; r <= *p; r++)
+        rep(t, r);
+    printf("\t\t\t");
+    for (r = i; inp[r] != '\0'; r++)
+        printf("%c", inp[r]);
+}
+void rep(char t[], int r)
+{
+    char c;
+    c = t[r];
+    switch (c)
+    {
+    case 'a':
+        printf("0");
+        break;
+    case 'b':
+        printf("1");
+        break;
+    case 'c':
+        printf("2");
+        break;
+    case 'd':
+        printf("3");
+        break;
+    case 'e':
+        printf("4");
+        break;
+    case 'f':
+        printf("5");
+        break;
+    case 'g':
+        printf("6");
+        break;
+    case 'h':
+        printf("7");
+        break;
+    case 'm':
+        printf("8");
+        break;
+    case 'j':
+        printf("9");
+        break;
+    case 'k':
+        printf("10");
+        break;
+    case 'l':
+        printf("11");
+        break;
+    default:
+        printf("%c", t[r]);
+        break;
+    }
+}
+
+Output:
+ 
+ 
+ 
+Practical 12: Implement a C program to implement LALR parsing.
+Code:
+#include <stdio.h>
+#include <string.h>
+
+char *input;
+int i = 0;
+char lasthandle[6], stack[50], handles[][5] = {")E(", "E*E", "E+E", "i", "E^E"};
+int top = 0, l;
+char prec[9][9] = {
+'>', '>','<','<','<','<','<','>','>',
+'>', '>','<','<','<','<','<','>','>',
+'>', '>','>','>','<','<','<','>','>',
+'>', '>','>','>','<','<','<','>','>',
+'>', '>','>','>','<','<','<','>','>',
+'>', '>','>','>','>','e','e','>','>',
+'<', '<','<','<','<','<','<','>','e',
+'>', '>','>','>','>','e','e','>','>',
+'<', '<','<','<','<','<','<','<','>',
+};
+
+int getindex(char c)
+{
+    switch (c)
+    {
+    case '+':
+        return 0;
+    case '-':
+        return 1;
+    case '*':
+        return 2;
+    case '/':
+        return 3;
+    case '^':
+        return 4;
+    case 'i':
+        return 5;
+    case '(':
+        return 6;
+    case ')':
+        return 7;
+    case '$':
+        return 8;
+    }
+}
+
+int shift()
+{
+    stack[++top] = *(input + i++);
+    stack[top + 1] = '\0';
+}
+int reduce()
+{
+    int i, len, found, t;
+    for (i = 0; i < 5; i++)
+    {
+        len = strlen(handles[i]);
+        if (stack[top] == handles[i][0] && top + 1 >= len)
+        {
+            found = 1;
+            for (t = 0; t < len; t++)
+            {
+                if (stack[top - t] != handles[i][t])
+                {
+                    found = 0;
+                    break;
+                }
+            }
+            if (found == 1)
+            {
+                stack[top - t + 1] = 'E';
+                top = top - t + 1;
+                strcpy(lasthandle, handles[i]);
+                stack[top + 1] = '\0';
+                return 1;
+            }
+        }
+
+    }
+
+    return 0;
+}
+void dispstack()
+{
+    int j;
+    for (j = 0; j <= top; j++)
+    {
+        printf("%c", stack[j]);
+    }
+}
+void dispinput()
+{
+    int j;
+    for (j = i; j < l; j++)
+    {
+        printf("%c", *(input + j));
+    }
+}
+void main()
+{
+    int j;
+    input = (char *)malloc(50 * sizeof(char));
+    printf("\nEnter the string\n");
+    scanf("%s", input);
+    input = strcat(input, "$");
+    l = strlen(input);
+    strcpy(stack, "$");
+    printf("\nSTACK\tINPUT\tACTION");
+    while (i <= l)
+    {
+        shift();
+        printf("\n");
+        dispstack();
+        printf("\t");
+        dispinput();
+        printf("\tShift");
+        if (prec[getindex(stack[top])][getindex(input[i])] == '>')
+        {
+            while (reduce())
+            {
+                printf("\n");
+                dispstack();
+                printf("\t");
+                dispinput();
+                printf("\tReduced: E->%s", lasthandle);
+            }
+        }
+    }
+    if (strcmp(stack, "$E$") == 0)
+    {
+        printf("\nAccepted;");
+    }
+    else
+    {
+        printf("\nNot Accepted;");
+    }
+}
+
+
+
+
+Output:
+ 
+
